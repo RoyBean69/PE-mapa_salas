@@ -3,43 +3,58 @@
 <head>
     <title>Mapa de Salas 2026</title>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
-        body { margin: 0; padding: 0; }
+        body { margin: 0; padding: 0; overflow: hidden; }
         #map { height: 100vh; width: 100vw; background: #e0e0e0; }
-        .leaflet-tooltip { font-family: sans-serif; font-size: 11px; padding: 10px; }
+        /* Tooltip optimizado para lectura en móvil */
+        .leaflet-tooltip { 
+            font-family: sans-serif; 
+            font-size: 14px !important; 
+            padding: 12px; 
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
     <script>
-        // Inicializar mapa
-        var map = L.map('map').setView([-12.04, -77.03], 6);
+        // Configuración del mapa
+        var map = L.map('map', { zoomSnap: 0.5, tap: true }).setView([-12.04, -77.03], 6); 
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
+        // Colores por Dueño
         function getColor(d) {
             if (!d) return '#00008B';
             d = d.trim();
-            if (d === 'AA') return '#FF0000';
-            if (d === 'Gladcon') return '#9400D3';
-            if (d === 'Masaris') return '#008000';
-            if (d === 'Rosenberg') return '#808080';
-            if (d === 'Sam') return '#FF8C00';
-            return '#00008B';
+            var colores = {
+                'AA': '#FF0000',
+                'Gladcon': '#9400D3',
+                'Masaris': '#008000',
+                'Rosenberg': '#808080',
+                'Sam': '#FF8C00'
+            };
+            return colores[d] || '#00008B';
         }
 
-        function getRadius(m, z) {
-            // Factor 0.45 para tamaño medio
-            return (Math.sqrt(m) * 0.45) * (z / 6);
+        // Tamaño de los círculos
+        function getRadius(maq, zoom) {
+            return (Math.sqrt(maq) * 0.5) * (zoom / 6);
         }
 
-        // --- PEGA AQUÍ TUS 466 FILAS DE EXCEL ---
+        // ==========================================
+        // ABAJO: PEGA TUS DATOS DEL EXCEL
+        // ==========================================
         var salas = [
-            {"RUC":"20258385994","Empresa":"CASTILLO DE ORO S.A.","Establecimiento":"CASTILLO DE ORO","Giro":"-","Resolucion":"4179","Vigencia":"46655","Maq":98,"Direccion":"Av. SAENZ PEÑA No. 506","Distrito":"CALLAO","Dueño":"-","lat":-12.060729,"lng":-77.141269},
+
+        // {"RUC":"20258385994","Empresa":"CASTILLO DE ORO S.A.","Establecimiento":"CASTILLO DE ORO","Giro":"-","Resolucion":"4179","Vigencia":"46655","Maq":98,"Direccion":"Av. SAENZ PEÑA No. 506","Distrito":"CALLAO","Dueño":"-","lat":-12.060729,"lng":-77.141269},
 {"RUC":"20302871427","Empresa":"FLAMINGO GAMES S.A.C.","Establecimiento":"EL DORADO CALLAO","Giro":"-","Resolucion":"3576","Vigencia":"46347","Maq":100,"Direccion":"Av. SAENZ PEÑA No. 619 - 619","Distrito":"CALLAO","Dueño":"-","lat":-12.060414,"lng":-77.139403},
 {"RUC":"20463145734","Empresa":"MESAC SLOT S.A.C.","Establecimiento":"CONTTENTO","Giro":"REST. 5TT","Resolucion":"2923 - 2025","Vigencia":"47598","Maq":127,"Direccion":"Av. Saenz Peña No. 572","Distrito":"CALLAO","Dueño":"Grupo Fencri","lat":-12.06055,"lng":-77.140132},
 {"RUC":"20491975513","Empresa":"ISA PERU GROUP S.A.C.","Establecimiento":"TRAGAMONEDAS VENEZIA","Giro":"REST. 5TT","Resolucion":"5196","Vigencia":"47087","Maq":62,"Direccion":"Av. LA PLAYA MZ. R5 Lt. 21","Distrito":"VENTANILLA","Dueño":"Ivan Orijuela","lat":-11.87194,"lng":-77.14171},
@@ -380,7 +395,7 @@
 {"RUC":"20530811001","Empresa":"NEVADA ENTRETENIMIENTOS S.A.C.","Establecimiento":"CHINCHA 3","Giro":"-","Resolucion":"3110","Vigencia":"46593","Maq":74,"Direccion":"MARISCAL BENAVIDES No. 220 - 226","Distrito":"CHINCHA ALTA","Dueño":"Rosenberg","lat":-13.417631,"lng":-76.134375},
 {"RUC":"20546344631","Empresa":"SAWILA GAMING S.A.C.","Establecimiento":"GAMBINOS CHINCHA","Giro":"-","Resolucion":"2589","Vigencia":"46260","Maq":112,"Direccion":"Av. MARISCAL BENAVIDES No. 327","Distrito":"CHINCHA ALTA","Dueño":"GG: Nasser Ode","lat":-13.417172,"lng":-76.136092},
 {"RUC":"20611795221","Empresa":"RALLY GAMING S.A.C.","Establecimiento":"REAL PALACE","Giro":"-","Resolucion":"6518 - 2025","Vigencia":"47738","Maq":112,"Direccion":"Calle PLAZA DE ARMAS No. 314","Distrito":"CHINCHA ALTA","Dueño":"Renzo Guerra","lat":-13.417252,"lng":-76.133041},
-{"RUC":"20463145734","Empresa":"MESAC SLOT S.A.C.","Establecimiento":"Slot And Fiesta   ","Giro":"-","Resolucion":"002351   ","Vigencia":"46007","Maq":204,"Direccion":"Av. 28 De Julio 325 Y Calle Jose T. Garcia 118   ","Distrito":"HUACHO","Dueño":"Grupo Fencri","lat":-11.107329,"lng":-77.607449},
+{"RUC":"20463145734","Empresa":"MESAC SLOT S.A.C.","Establecimiento":"Slot And Fiesta   ","Giro":"-","Resolucion":"002351   ","Vigencia":"46295","Maq":194,"Direccion":"Av. 28 De Julio 325 Y Calle Jose T. Garcia 118   ","Distrito":"HUACHO","Dueño":"Grupo Fencri","lat":-11.107329,"lng":-77.607449},
 {"RUC":"20305556786","Empresa":"GAMING AND SERVICES S.A.C.","Establecimiento":"SALA CHIMBOTE","Giro":"-","Resolucion":"1577","Vigencia":"--","Maq":102,"Direccion":"Av. VICTOR RAUL HAYA DE LA TORRE No. 746","Distrito":"CHIMBOTE","Dueño":"Cirsa","lat":-9.076222,"lng":-78.591075},
 {"RUC":"20502695151","Empresa":"INVERSIONES Y REPRESENTACIONES CECAR S.A.C.","Establecimiento":"LAS VEGAS","Giro":"-","Resolucion":"3046","Vigencia":"46585","Maq":195,"Direccion":"Av. VICTOR RAUL HAYA DE LA TORRE No. 668 - 672 y Jr. MANUEL RUIZ No. 277 - 281","Distrito":"CHIMBOTE","Dueño":"Renzo Guerra ???","lat":-9.0761,"lng":-78.591455},
 {"RUC":"20530811001","Empresa":"NEVADA ENTRETENIMIENTOS S.A.C.","Establecimiento":"SALA CHIMBOTE 1","Giro":"-","Resolucion":"8526 - 2025","Vigencia":"47432","Maq":52,"Direccion":"Jr. LEONCIO PRADO 623 No. 623","Distrito":"CHIMBOTE","Dueño":"Rosenberg","lat":-9.074634,"lng":-78.591461},
@@ -402,7 +417,7 @@
 {"RUC":"20611137355","Empresa":"CORPORACION EMPRESARIAL HOLDING S.A.C.","Establecimiento":"MOULIN ROUGE","Giro":"-","Resolucion":"642 - 2025","Vigencia":"47514","Maq":179,"Direccion":"Jr. MARISCAL ORBEGOSO No. 524","Distrito":"TRUJILLO","Dueño":"Gladcon","lat":-8.112019,"lng":-79.027546},
 {"RUC":"20611137355","Empresa":"CORPORACION EMPRESARIAL HOLDING S.A.C.","Establecimiento":"EXCALIBUR","Giro":"-","Resolucion":"645 - 2025","Vigencia":"47514","Maq":311,"Direccion":"Av. FRANCISCO PIZARRO No. 657","Distrito":"TRUJILLO","Dueño":"Gladcon","lat":-8.109789,"lng":-79.026052},
 {"RUC":"20611137355","Empresa":"CORPORACION EMPRESARIAL HOLDING S.A.C.","Establecimiento":"STAR","Giro":"-","Resolucion":"650 - 2025","Vigencia":"47514","Maq":115,"Direccion":"Jr. LUIS JOSE DE ORBEGOSO No. 554 - 558","Distrito":"TRUJILLO","Dueño":"Gladcon","lat":-8.112229,"lng":-79.02733},
-{"RUC":"20463564621","Empresa":"INTERSTATE GAMING DEL PERU S.A.","Establecimiento":"MACAO","Giro":"HOTEL ****","Resolucion":"1448","Vigencia":"--","Maq":145,"Direccion":"Av. SAN MARTIN No. 562","Distrito":"TACNA","Dueño":"Cirsa (Masaris???)","lat":-18.012375,"lng":-70.249119},
+{"RUC":"20463564621","Empresa":"INTERSTATE GAMING DEL PERU S.A.","Establecimiento":"MACAO","Giro":"HOTEL ****","Resolucion":"1448","Vigencia":"--","Maq":145,"Direccion":"Av. SAN MARTIN No. 562","Distrito":"TACNA","Dueño":"Masaris","lat":-18.012375,"lng":-70.249119},
 {"RUC":"20530811183","Empresa":"ALPAMAYO INVERSIONES S.A.C.","Establecimiento":"SALA TACNA","Giro":"-","Resolucion":"1230","Vigencia":"--","Maq":417,"Direccion":"Calle SAN MARTIN CON CALLE BOLIVAR 518 (ANTES 524) Y 530 No. 549 - 557","Distrito":"TACNA","Dueño":"Rosenberg","lat":-18.012544,"lng":-70.249178},
 {"RUC":"20531521987","Empresa":"NEGOCIACIONES E INVERSIONES DORAL S.A.C.","Establecimiento":"VILLA FORTUNA","Giro":"-","Resolucion":"3817 - 2024","Vigencia":"46944","Maq":431,"Direccion":"Calle SAN MARTIN No. 736 y Calle ZELA No. 741","Distrito":"TACNA","Dueño":"Abusada","lat":-18.011388,"lng":-70.247679},
 {"RUC":"20611137355","Empresa":"CORPORACION EMPRESARIAL HOLDING S.A.C.","Establecimiento":"ISLA DEL TESORO","Giro":"-","Resolucion":"627 - 2025","Vigencia":"47514","Maq":135,"Direccion":"Av. SAN MARTIN No. 680","Distrito":"TACNA","Dueño":"Gladcon","lat":-18.011788,"lng":-70.248264},
@@ -506,48 +521,33 @@
 {"RUC":"20611137355","Empresa":"CORPORACION EMPRESARIAL HOLDING S.A.C.","Establecimiento":"BALTA SLOTS","Giro":"-","Resolucion":"644 - 2025","Vigencia":"47514","Maq":123,"Direccion":"Av. JOSE BALTA No. 525 - 535","Distrito":"CHICLAYO","Dueño":"Gladcon","lat":-6.773478,"lng":-79.838664},
 {"RUC":"20611137355","Empresa":"CORPORACION EMPRESARIAL HOLDING S.A.C.","Establecimiento":"CASINO BAGDAD","Giro":"-","Resolucion":"646 - 2025","Vigencia":"47514","Maq":154,"Direccion":"Jr. ELIAS AGUIRRE No. 498 y Jr. JUAN CUGLIEVAN No. 685 - 691","Distrito":"CHICLAYO","Dueño":"Gladcon","lat":-6.77173,"lng":-79.84047}
 
+
         ]; 
-        // --- FIN DE PEGADO (Asegúrate que no haya una coma antes de ]; ) ---
+        // ==========================================
 
-        var markers = [];
-
+        // Dibujar las salas
         salas.forEach(function(s) {
             if (!s.lat || !s.lng) return;
-
             var color = getColor(s.Dueño);
             
             var c = L.circleMarker([s.lat, s.lng], {
                 radius: getRadius(s.Maq, map.getZoom()),
                 fillColor: color,
                 color: "white",
-                weight: 0.5,
+                weight: 1,
                 fillOpacity: 0.7
             }).addTo(map);
 
-            L.circleMarker([s.lat, s.lng], {
-                radius: 1.2,
-                fillColor: "black",
-                color: "black",
-                fillOpacity: 1
-            }).addTo(map);
+            // Punto central negro para precisión
+            L.circleMarker([s.lat, s.lng], { radius: 1.5, fillColor: "black", color: "black", fillOpacity: 1 }).addTo(map);
 
             c.bindTooltip(`
-                <div style="line-height:1.4">
-                    <b style="color:${color}; font-size:13px">${s.Establecimiento}</b><br>
-                    <b>Dueño:</b> ${s.Dueño}<br><hr>
-                    <b>Empresa:</b> ${s.Empresa}<br>
+                <div style="line-height:1.5">
+                    <b style="color:${color}; font-size:15px">${s.Establecimiento}</b><br>
+                    <b>Dueño:</b> ${s.Dueño}<br>
                     <b>Máquinas:</b> ${s.Maq}<br>
-                    <b>Dirección:</b> ${s.Direccion}<br>
+                    <small>${s.Direccion}</small>
                 </div>`, { sticky: true });
-
-            markers.push({layer: c, maq: s.Maq});
-        });
-
-        map.on('zoomend', function() {
-            var z = map.getZoom();
-            markers.forEach(function(m) {
-                m.layer.setRadius(getRadius(m.maq, z));
-            });
         });
     </script>
 </body>
